@@ -1,0 +1,17 @@
+{
+  "name": "claude-marketplace",
+  "owner": {
+    "name": "Pierre-André",
+    "email": "pierreandre@folot.net"
+  },
+  "plugins": [
+    {
+      "name": "projectionlab",
+      "source": "./plugins/projectionlab",
+      "description": "Read-only access to ProjectionLab financial plans via the Chrome MCP. Extracts plan settings, milestones, income, expenses, accounts, withdrawal strategies, and Monte Carlo results from the Pinia stores.",
+      "version": "0.1.0",
+      "category": "personal-finance",
+      "tags": ["projectionlab", "finance", "chrome-mcp"]
+    }
+  ]
+}

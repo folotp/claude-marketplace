@@ -6,9 +6,11 @@ Personal Claude marketplace. Hosts plugins (skills, commands, agents, hooks, MCP
 
 ```text
 /plugin marketplace add folotp/claude-marketplace
-/plugin install <plugin-name>@claude-marketplace
+/plugin install <plugin-name>@folotp-marketplace
 /reload-plugins
 ```
+
+The marketplace `name` (`folotp-marketplace`) differs from the repo name (`claude-marketplace`) because Claude Code rejects marketplace names that impersonate official Anthropic marketplaces.
 
 For a private repo, ensure `gh auth status` shows you're logged in to GitHub before running `/plugin marketplace add`.
 
@@ -42,7 +44,7 @@ Skills, commands, agents, and hooks are auto-discovered from their conventional 
 2. Add an entry to `.claude-plugin/marketplace.json` under `plugins[]` with `name`, `source: "./plugins/<name>"`, `description`, `version`.
 3. Optionally add `plugins/<name>/.claude-plugin/plugin.json` with version + description for discoverability.
 4. Bump the plugin's version on each meaningful change.
-5. Commit and push. Re-installation in Claude Code: `/plugin marketplace update claude-marketplace` then `/plugin install <name>@claude-marketplace`.
+5. Commit and push. Re-installation in Claude Code: `/plugin marketplace update folotp-marketplace` then `/plugin install <name>@folotp-marketplace`.
 
 ## License
 

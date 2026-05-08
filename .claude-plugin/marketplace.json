@@ -19,6 +19,7 @@
         "source": "github",
         "repo": "folotp/organon-plugin",
         "ref": "v0.4.0",
+        "commit": "560a5dbed7fc8d72630415e09eb8740c54c97952",
         "sha": "560a5dbed7fc8d72630415e09eb8740c54c97952"
       },
       "version": "0.4.0",

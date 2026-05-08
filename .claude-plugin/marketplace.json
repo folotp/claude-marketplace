@@ -15,7 +15,10 @@
     },
     {
       "name": "organon",
-      "source": "folotp/organon-plugin",
+      "source": {
+        "source": "github",
+        "repo": "folotp/organon-plugin"
+      },
       "description": "Organon vault conventions for Claude — 7 description-triggered skills covering MCP write discipline, frontmatter schema, body markdown style, session discipline, Bases views, JSON Canvas cartography, and Mermaid/Excalidraw diagramming. Absorbs kepano obsidian-skills content verbatim (drift-tracked) — no runtime cascade required.",
       "category": "knowledge-management",
       "tags": ["obsidian", "organon", "vault", "frontmatter", "session-discipline", "knowledge-management"]

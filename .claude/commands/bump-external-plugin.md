@@ -1,5 +1,5 @@
 ---
-description: Bump an external GitHub-source plugin to its source repo's latest release (resolves tag + sha, updates all four pinning fields)
+description: Bump an external GitHub-source plugin to its source repo's latest release (resolves tag + sha, rewrites source.ref and source.sha)
 argument-hint: <plugin-name>
 ---
 
@@ -8,6 +8,10 @@ Bump the `$1` plugin's pinning to the latest release in its source GitHub repo.
 ## When to use
 
 For external github-source entries in `.claude-plugin/marketplace.json` (entries whose `source` is an object with `{source: "github", repo: ...}`). Not for in-repo plugins (those use `/bump-plugin`).
+
+## Single source of truth
+
+Per the [plugin marketplace docs](https://code.claude.com/docs/en/plugin-marketplaces#version-resolution-and-release-channels), version lives in the source repo's `plugin.json` — never duplicated in `marketplace.json`. This command rewrites the marketplace entry's `source.ref` and `source.sha` to point at the latest release, then updates the README plugins table for human readers. The version itself is read from the source `plugin.json`; the marketplace entry has no `version` field.
 
 ## Steps
 
@@ -26,26 +30,29 @@ For external github-source entries in `.claude-plugin/marketplace.json` (entries
    gh api /repos/<repo>/commits/<tagName> --jq '.sha'
    ```
 
-5. **Compute the new version string.** Strip a leading `v` from `tagName` (e.g. `v0.4.1` -> `0.4.1`). If `tagName` doesn't start with `v` or `V`, use it as-is.
+5. **Resolve the version** declared on that commit's `plugin.json`:
+   ```bash
+   gh api /repos/<repo>/contents/.claude-plugin/plugin.json?ref=<tagName> --jq '.content' | base64 -d | python3 -c 'import json,sys; print(json.load(sys.stdin)["version"])'
+   ```
+   This is the value the README plugins table will display. If it differs from `tagName` minus a leading `v`, surface the discrepancy and ask the user whether to proceed.
 
-6. **Compare to current state.** Read current `version` and `source.ref` in the entry. If both already match the latest tag, report "already at latest (vX.Y.Z)" and stop — no diff to make.
+6. **Compare to current state.** Read current `source.ref` and `source.sha` in the entry. If both already match the latest tag, report "already at latest (`<tagName>`)" and stop — no diff to make.
 
-7. **Rewrite the entry**, updating four fields together:
+7. **Rewrite the entry**, updating two fields:
    - `source.ref` -> `<tagName>` (e.g. `v0.4.1`)
-   - `source.commit` -> `<sha>`
-   - `source.sha` -> `<sha>`
-   - top-level `version` -> the version string from step 5
+   - `source.sha` -> `<sha>` (40-char commit SHA)
 
-   Keep all other fields (`description`, `category`, `tags`, etc.) untouched.
+   Keep all other fields untouched. **Do not add `commit` or a top-level `version`** — `commit` is not in the documented schema, and version lives in `plugin.json` per the doc warning.
 
-8. **Update README plugins table.** Find the row where the link target contains `$1` (or matches the plugin name in the first cell). Set the version cell to the new version string.
+8. **If the entry has stale `commit` or top-level `version` fields** (left over from before the doc-aligned cleanup), remove them in the same diff.
 
-9. **Validate JSON.** Run `python3 -m json.tool .claude-plugin/marketplace.json > /dev/null`. The PostToolUse hooks will also fire on the edit.
+9. **Update README plugins table.** Find the row whose link target contains `$1` (or matches the plugin name in the first cell). Set the version cell to the version from step 5.
 
-10. **Show `git diff`** and stop. Do not stage, do not commit. PA reviews and commits manually.
+10. **Validate JSON.** Run `python3 -m json.tool .claude-plugin/marketplace.json > /dev/null`. The PostToolUse hook will also fire on the edit.
+
+11. **Show `git diff`** and stop. Do not stage, do not commit. PA reviews and commits manually.
 
 ## Notes
 
-- Both `commit` and `sha` get the same value — Anthropic's loader empirically requires `commit` (the schema lists only `sha`, but the official `claude-plugins-official` marketplace ships both, and bare-`sha` shapes have failed with "Failed to update marketplace" historically).
-- The source repo must be public — the Desktop plugin-source fetcher uses anonymous access and rejects private repos with "Repository not found".
-- After commit + push, install side: `/plugin marketplace update folotp-marketplace` then the Desktop UI should show an Update button on the plugin row (because marketplace `version` advanced past the installed `version`).
+- The source repo must be public — Anthropic Desktop's plugin-source fetcher uses anonymous access and rejects private repos with "Repository not found".
+- After commit + push, install side: `/plugin marketplace update folotp-marketplace` then click Update on the plugin row in Desktop. Update detection compares the user's installed `plugin.json` version against the version of the manifest at the new pinned ref.

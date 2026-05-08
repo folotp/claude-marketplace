@@ -25,8 +25,10 @@ For a private repo, ensure `gh auth status` shows you're logged in to GitHub bef
 
 Two patterns are supported:
 
-- **In-repo** (e.g. `projectionlab`): the plugin tree lives under `plugins/<name>/` of this marketplace. The marketplace entry uses `"source": "./plugins/<name>"` and a pinned `version`. Bump version on each release.
-- **External GitHub repo** (e.g. `organon` → `folotp/organon-plugin`): the plugin lives in its own repo with `.claude-plugin/plugin.json` at root. The marketplace entry uses the canonical object form `{"source": "github", "repo": "owner/repo", "ref": "vX.Y.Z", "commit": "<sha>", "sha": "<sha>"}` plus a top-level `"version": "X.Y.Z"`. The source repo must be **public** (Anthropic's Desktop plugin-source fetcher uses anonymous access — private repos are rejected with "Repository not found"). Floating (`{source, repo}` only, no `version`) loads but disables the Desktop UI's version label and Update button — pin to a release tag for proper update notifications. Bump on each release with `/bump-external-plugin <name>` (auto-resolves the latest tag + sha).
+- **In-repo** (e.g. `projectionlab`): the plugin tree lives under `plugins/<name>/` of this marketplace. The marketplace entry uses `"source": "./plugins/<name>"`. The version lives in `plugins/<name>/.claude-plugin/plugin.json` — bump it on each meaningful change so users get an Update notification (`/bump-plugin <name> <version>`).
+- **External GitHub repo** (e.g. `organon` → `folotp/organon-plugin`): the plugin lives in its own **public** repo with `.claude-plugin/plugin.json` at root. Private source repos are rejected by the Desktop plugin-source fetcher (uses anonymous access). The marketplace entry uses the documented github source object: `{"source": "github", "repo": "owner/repo", "ref": "vX.Y.Z", "sha": "<40-char SHA>"}`. The version is read from `plugin.json` on the pinned ref — bump on each release with `/bump-external-plugin <name>` (auto-resolves the latest tag + sha).
+
+**Single source of truth for version.** Per the [official docs](https://code.claude.com/docs/en/plugin-marketplaces#version-resolution-and-release-channels), Claude Code resolves a plugin's version from the first of these set: `version` in `plugin.json` -> `version` in the marketplace entry -> the source's commit SHA. **Don't set `version` in both `plugin.json` and the marketplace entry** — `plugin.json` always wins silently, so a stale duplicate can mask a real bump. This marketplace keeps `version` in `plugin.json` only.
 
 ## Layout
 
@@ -50,19 +52,19 @@ Skills, commands, agents, and hooks are auto-discovered from their conventional 
 
 ### Option A — In-repo (small plugins, tight coupling to marketplace lifecycle)
 
-1. Create `plugins/<name>/` with at minimum a `skills/<name>/SKILL.md`.
-2. Add an entry to `.claude-plugin/marketplace.json` under `plugins[]` with `name`, `source: "./plugins/<name>"`, `description`, `version`.
-3. Optionally add `plugins/<name>/.claude-plugin/plugin.json` with version + description for discoverability.
-4. Bump the plugin's version on each meaningful change.
-5. Commit and push. Re-installation in Claude Code: `/plugin marketplace update folotp-marketplace` then `/plugin install <name>@folotp-marketplace`.
+1. Create `plugins/<name>/` with at minimum a `skills/<name>/SKILL.md` (or commands/agents/hooks).
+2. Create `plugins/<name>/.claude-plugin/plugin.json` with `name`, `version`, `description`, `author`. **The `version` here drives Update detection — bump it on every meaningful change.**
+3. Add an entry to `.claude-plugin/marketplace.json` under `plugins[]` with `name`, `source: "./plugins/<name>"`, `description`, `category`, `tags`. Do **not** duplicate `version` here.
+4. Use `/bump-plugin <name> <version>` to bump on each release (updates `plugin.json` and the README plugins table).
+5. Commit and push. Re-installation: `/plugin marketplace update folotp-marketplace` then `/plugin install <name>@folotp-marketplace`.
 
 ### Option B — External GitHub source (own repo, independent lifecycle)
 
 1. The plugin lives in its own **public** repo (e.g. `folotp/<name>-plugin`) with `.claude-plugin/plugin.json` at root and the standard layout below it. Private source repos are rejected by the Desktop plugin-source fetcher.
-2. Tag a release in the source repo (e.g. `v0.1.0`) before adding the marketplace entry.
-3. Add an entry to `.claude-plugin/marketplace.json` under `plugins[]` with `name`, `description`, `version: "X.Y.Z"`, and `source` as the canonical object form: `{"source": "github", "repo": "owner/repo", "ref": "vX.Y.Z", "commit": "<sha>", "sha": "<sha>"}`. Both `commit` and `sha` are needed (loader requirement, despite the public schema only listing `sha`).
+2. Tag a release in the source repo (e.g. `v0.1.0`) before adding the marketplace entry. The release commit's `plugin.json` must declare a `version` matching the tag.
+3. Add an entry to `.claude-plugin/marketplace.json` under `plugins[]` with `name`, `description`, `category`, `tags`, and `source` as the documented github source object: `{"source": "github", "repo": "owner/repo", "ref": "vX.Y.Z", "sha": "<40-char SHA>"}`. Do **not** add `commit` (not in the schema) or a top-level `version` (let `plugin.json` own it).
 4. Commit and push the marketplace update. The plugin repo evolves independently between releases — only push to the marketplace when a new release is cut.
-5. **Bump on each release**: run `/bump-external-plugin <name>` to auto-resolve the latest tag + sha from the source repo and rewrite all four fields together.
+5. **Bump on each release**: run `/bump-external-plugin <name>` — auto-resolves the latest tag + sha from the source repo and rewrites `source.ref` + `source.sha` together.
 6. Re-installation: same `/plugin marketplace update folotp-marketplace` then `/plugin install <name>@folotp-marketplace`.
 
 ## License

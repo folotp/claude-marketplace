@@ -5,15 +5,20 @@ Validates the bumper's diff before the workflow commits:
   - marketplace.json parses as JSON
   - every external entry has ref (non-empty) and sha (40-char hex)
   - no external entry carries forbidden fields (`commit`, top-level `version`)
-  - the README plugins-table row exists for each external entry and its
-    version cell matches the version declared by plugin.json at the pinned ref
+  - the README plugins-table row exists for each external entry
+  - [online only] the README version cell matches the version declared by
+    plugin.json at the pinned ref
 
 Exits non-zero on any failure. Stdlib only. Shells out to `gh` for the
-plugin.json read at the pinned ref.
+plugin.json read at the pinned ref (online mode).
+
+Pass --offline to skip the GitHub API call. Used by the PostToolUse hook
+to keep the local edit loop fast; CI uses the default (online) mode.
 """
 
 from __future__ import annotations
 
+import argparse
 import base64
 import json
 import re
@@ -55,6 +60,12 @@ def readme_version_for(plugin_name: str) -> str | None:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--offline", action="store_true",
+        help="skip GitHub API checks (no version cross-reference)"
+    )
+    args = parser.parse_args()
     errors: list[str] = []
 
     try:
@@ -89,28 +100,32 @@ def main() -> int:
             errors.append(f"{name}: missing source.repo")
             continue
 
+        readme_version = readme_version_for(name)
+        if readme_version is None:
+            errors.append(f"{name}: no README plugins-table row found")
+
+        if args.offline:
+            continue
+
         try:
             expected_version = plugin_version_at(repo, ref)
         except Exception as e:
             errors.append(f"{name}: failed to resolve plugin.json at {ref}: {e}")
             continue
 
-        readme_version = readme_version_for(name)
-        if readme_version is None:
-            errors.append(f"{name}: no README plugins-table row found")
-        elif readme_version != expected_version:
+        if readme_version is not None and readme_version != expected_version:
             errors.append(
                 f"{name}: README version cell '{readme_version}' "
                 f"!= plugin.json '{expected_version}' at {ref}"
             )
 
     if errors:
-        print("validate-marketplace: FAIL")
+        print("validate-marketplace: FAIL" + (" (offline)" if args.offline else ""))
         for err in errors:
             print(f"  - {err}")
         return 1
 
-    print("validate-marketplace: OK")
+    print("validate-marketplace: OK" + (" (offline)" if args.offline else ""))
     return 0
 
 

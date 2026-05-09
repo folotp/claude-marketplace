@@ -5,6 +5,8 @@ argument-hint: <plugin-name>
 
 Bump the `$1` plugin's pinning to the latest release in its source GitHub repo.
 
+> **Note.** The `.github/workflows/auto-bump-external-plugins.yml` workflow already bumps every external entry on a 30-min cron and on `repository_dispatch` from each source repo. This manual command remains for ad-hoc dry-run preview (it stops at `git diff` instead of committing), targeting a single plugin, or emergency overrides when CI is unavailable.
+
 ## When to use
 
 For external github-source entries in `.claude-plugin/marketplace.json` (entries whose `source` is an object with `{source: "github", repo: ...}`). Not for in-repo plugins (those use `/bump-plugin`).

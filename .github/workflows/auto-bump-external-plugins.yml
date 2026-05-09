@@ -1,0 +1,71 @@
+name: Auto-bump external plugins
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  repository_dispatch:
+    types: [external-plugin-release]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: auto-bump-external-plugins
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run bumper
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/bump-external-plugins.py
+
+      - name: Detect changes
+        id: diff
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Validate
+        if: steps.diff.outputs.changed == 'true'
+        id: validate
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python3 scripts/validate-marketplace.py
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed == 'true' && steps.validate.outcome == 'success'
+        run: |
+          git config user.name 'marketplace-bot'
+          git config user.email 'noreply@github.com'
+          git add .claude-plugin/marketplace.json README.md
+          git commit -m "chore(marketplace): auto-bump external plugins"
+          git push
+
+      - name: Open issue on validation failure
+        if: steps.diff.outputs.changed == 'true' && steps.validate.outcome != 'success'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          {
+            echo 'The auto-bump workflow produced a diff that failed validation. The diff was NOT committed.'
+            echo
+            echo '## Diff'
+            echo
+            echo '```diff'
+            git diff
+            echo '```'
+          } > /tmp/issue-body.md
+          gh issue create \
+            --title "Auto-bump validation failed on $(date -u +%Y-%m-%dT%H:%MZ)" \
+            --body-file /tmp/issue-body.md

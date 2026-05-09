@@ -78,7 +78,19 @@ Triggers:
 
 ### Wiring up `repository_dispatch` in a source repo
 
-To get instant updates instead of waiting up to 30 min for cron, add this workflow in the source repo (e.g. `folotp/<name>-plugin`):
+To get instant updates instead of waiting up to 30 min for cron, do these two steps in the source repo (e.g. `folotp/<name>-plugin`):
+
+**1. Create a PAT and store it as a repo secret.**
+
+Generate a token at <https://github.com/settings/tokens>:
+- Classic PAT: `repo` scope.
+- Fine-grained PAT (preferred, tighter): scoped to `folotp/claude-marketplace`, repository permission `Contents: write` (this is what the `repository_dispatch` endpoint requires).
+
+Then in the source repo: **Settings → Secrets and variables → Actions → New repository secret**. Name it `MARKETPLACE_DISPATCH_TOKEN`, paste the PAT.
+
+> Use the **Actions** tab, not Codespaces / Dependabot / Agents — those tabs scope secrets to other contexts (Codespaces dev envs, Dependabot-triggered runs, the Copilot Coding Agent) and are not visible to a `release: published` workflow.
+
+**2. Add this workflow file:**
 
 ```yaml
 # .github/workflows/notify-marketplace.yml
@@ -100,7 +112,7 @@ jobs:
             -f 'client_payload[tag]=${{ github.event.release.tag_name }}'
 ```
 
-Then create a PAT with permission to call `repos/folotp/claude-marketplace/dispatches` and store it as the source repo's `MARKETPLACE_DISPATCH_TOKEN` secret. A classic PAT with `repo` scope works; a fine-grained PAT scoped to `folotp/claude-marketplace` with `Contents: write` is the tighter equivalent. Without this dispatcher, the cron tick alone catches new releases within 30 min — so this step is purely a latency optimization.
+Without this dispatcher, the cron tick alone catches new releases within 30 min — this step is purely a latency optimization.
 
 The `client_payload` is informational; the bumper rescans every external entry regardless of which repo dispatched.
 

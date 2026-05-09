@@ -1,0 +1,24 @@
+name: Notify marketplace
+description: >-
+  Fire repository_dispatch to folotp/claude-marketplace so its auto-bump
+  workflow re-pins this source repo's ref+sha within seconds. Drop into
+  any external-source plugin's release workflow.
+inputs:
+  token:
+    description: >-
+      PAT with permission to call repos/folotp/claude-marketplace/dispatches.
+      Fine-grained: scoped to folotp/claude-marketplace, Contents:write.
+      Classic: repo scope.
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Dispatch
+      shell: bash
+      env:
+        GH_TOKEN: ${{ inputs.token }}
+      run: |
+        gh api repos/folotp/claude-marketplace/dispatches \
+          -f event_type=external-plugin-release \
+          -f "client_payload[repo]=${{ github.repository }}" \
+          -f "client_payload[tag]=${{ github.event.release.tag_name }}"

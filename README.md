@@ -102,17 +102,14 @@ jobs:
   dispatch:
     runs-on: ubuntu-latest
     steps:
-      - name: Fire repository_dispatch to claude-marketplace
-        env:
-          GH_TOKEN: ${{ secrets.MARKETPLACE_DISPATCH_TOKEN }}
-        run: |
-          gh api repos/folotp/claude-marketplace/dispatches \
-            -f event_type=external-plugin-release \
-            -f 'client_payload[repo]=${{ github.repository }}' \
-            -f 'client_payload[tag]=${{ github.event.release.tag_name }}'
+      - uses: folotp/claude-marketplace/.github/actions/notify-marketplace@main
+        with:
+          token: ${{ secrets.MARKETPLACE_DISPATCH_TOKEN }}
 ```
 
-Without this dispatcher, the cron tick alone catches new releases within 30 min — this step is purely a latency optimization.
+The dispatcher logic lives once, in the [`notify-marketplace`](.github/actions/notify-marketplace/action.yml) composite action of this repo — change it here and every source repo picks up the new behavior on its next release. Pin to `@main` for auto-update, or to a tag/sha (e.g. `@v1`) for stability.
+
+Without this workflow, the cron tick alone catches new releases within 30 min — this step is purely a latency optimization.
 
 The `client_payload` is informational; the bumper rescans every external entry regardless of which repo dispatched.
 

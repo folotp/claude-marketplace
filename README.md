@@ -19,7 +19,7 @@ For a private repo, ensure `gh auth status` shows you're logged in to GitHub bef
 | Plugin | Version | Source | Description |
 | --- | --- | --- | --- |
 | [`projectionlab`](plugins/projectionlab/) | 0.1.0 | in-repo | Read-only access to ProjectionLab financial plans via the Chrome MCP. |
-| [`organon`](https://github.com/folotp/organon-plugin) | 0.8.0 | [`folotp/organon-plugin`](https://github.com/folotp/organon-plugin) | Organon vault conventions for Claude — 7 description-triggered skills covering write discipline, frontmatter, markdown style, session discipline, Bases, JSON Canvas, and diagramming. |
+| [`organon`](https://github.com/folotp/organon-plugin) | 1.0.0 | [`folotp/organon-plugin`](https://github.com/folotp/organon-plugin) | Organon vault conventions for Claude — 7 description-triggered skills covering write discipline, frontmatter, markdown style, session discipline, Bases, JSON Canvas, and diagramming. |
 
 ## Plugin sources
 

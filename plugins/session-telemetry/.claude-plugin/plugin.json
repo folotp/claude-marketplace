@@ -1,0 +1,10 @@
+{
+  "name": "session-telemetry",
+  "version": "0.1.0",
+  "description": "Captures a structured snapshot of the current Claude session (context, tokens, tools, MCP, skills, errors) and appends one NDJSON line to the Organon vault telemetry log via istefox MCP. Feeds a future /analyze-telemetry skill for evidence-based optimization of skills, plugins, and instructions.",
+  "author": {
+    "name": "Pierre-André Folot",
+    "email": "pierreandre@folot.net"
+  },
+  "keywords": ["telemetry", "session", "ndjson", "organon", "analytics", "mcp-tools-istefox"]
+}

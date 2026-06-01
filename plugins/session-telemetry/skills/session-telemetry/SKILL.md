@@ -34,7 +34,7 @@ Work through these steps mentally before composing JSON. Build the record silent
 13. **session_id** — use runtime UUID if exposed; else generate a ULID and add `"session_id_source": "synthetic"`.
 14. **task** — one phrase ≤ 60 chars summarizing the session's main job.
 15. **tags** — lowercase; from `--tag` args plus any obvious topic tags.
-16. **plugin_versions** — for each name in `plugins[]`, run `find ~/.claude/plugins/cache -maxdepth 3 -name "plugin.json" -path "*/${name}/*" 2>/dev/null`. List the version subdirectories found; pick the highest semver (e.g. `1.1.0` beats `1.0.1`); if no semver format, pick alphabetical-last. Read `version` from that `plugin.json`; if the field is absent, use the directory name itself (e.g. `655b7d9c5431` or `unknown`). If no cache entry found, use `"unknown"`. Build map `{name: version}`.
+16. **plugin_versions** — for each name in `plugins[]`, run `find ~/.claude/plugins/cache -maxdepth 5 -name "plugin.json" -path "*/${name}/*" 2>/dev/null`. List the version subdirectories found; pick the highest semver (e.g. `1.1.0` beats `1.0.1`); if no semver format, pick alphabetical-last. Read `version` from that `plugin.json`; if the field is absent, use the directory name itself (e.g. `655b7d9c5431` or `unknown`). If no cache entry found, use `"unknown"`. Build map `{name: version}`.
 
 ## JSON Composition
 

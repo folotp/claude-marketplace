@@ -1,12 +1,12 @@
 # Session Telemetry Schema
 
-Version `v: 1`. One JSON object per line, terminated by `\n`.
+Version `v: 2`. One JSON object per line, terminated by `\n`.
 
 ## Field Reference
 
 | Field | Type | Rules |
 |---|---|---|
-| `v` | int | Schema version. Bump on breaking change. Current: `1`. |
+| `v` | int | Schema version. Bump on any schema change. Current: `2`. |
 | `ts` | string | ISO 8601 with timezone offset (e.g. `2026-05-26T14:30:00-04:00`). |
 | `session_id` | string | Runtime UUID if available; else ULID. If synthetic, add `"session_id_source": "synthetic"`. |
 | `surface` | string | `"cowork"` \| `"code"` \| `"chat"`. |
@@ -28,6 +28,7 @@ Version `v: 1`. One JSON object per line, terminated by `\n`.
 | `skills.available_count` | int | Count of entries in `<available_skills>` block; `0` if absent. |
 | `skills.invoked` | string[] | Skill names actually invoked via the Skill tool. |
 | `plugins` | string[] | Plugin names derived from `<plugin>:<skill>` skill identifiers. Deduplicated. |
+| `plugin_versions` | object | `{plugin_name: version_string}`. Keys match `plugins[]`. `"unknown"` when not determinable from cache path. Added in v:2. |
 | `errors` | object[] | `{tool: string, msg: string, when: "early"\|"mid"\|"late"}`. Empty array if no errors. |
 | `task` | string | One phrase ≤ 60 chars — the session's main job. |
 | `tags` | string[] | Lowercase. From `--tag` args + topic tags. |
@@ -35,7 +36,7 @@ Version `v: 1`. One JSON object per line, terminated by `\n`.
 ## Canonical Example
 
 ```json
-{"v":1,"ts":"2026-05-26T14:30:00-04:00","session_id":"c6f4c18a-495c-46cc-b800-f91b6eded3bb","surface":"cowork","model":"claude-opus-4-7","ctx":{"limit":200000,"used_est":45000,"pct_est":22,"confidence":"med"},"tokens":{"in_est":38000,"out_est":7000,"confidence":"low"},"tools":{"loaded":["Read","Edit","Bash","Grep","Glob"],"used":["Read","Bash"],"unused":["Edit","Grep","Glob"],"deferred_loaded":["TaskCreate","WebSearch"],"deferred_total":120},"mcp":{"servers":["cowork","workspace","mcp-tools-istefox","github"],"versions":{"mcp-tools-istefox":"unknown","github":"unknown"}},"skills":{"available_count":47,"invoked":["caveman","engineering:system-design"]},"plugins":["organon","engineering","mattpocock-skills","anthropic-skills"],"errors":[{"tool":"Read","msg":"ENOENT","when":"mid"}],"task":"design telemetry sys","tags":["design","telemetry","meta"]}
+{"v":2,"ts":"2026-05-26T14:30:00-04:00","session_id":"c6f4c18a-495c-46cc-b800-f91b6eded3bb","surface":"cowork","model":"claude-opus-4-7","ctx":{"limit":200000,"used_est":45000,"pct_est":22,"confidence":"med"},"tokens":{"in_est":38000,"out_est":7000,"confidence":"low"},"tools":{"loaded":["Read","Edit","Bash","Grep","Glob"],"used":["Read","Bash"],"unused":["Edit","Grep","Glob"],"deferred_loaded":["TaskCreate","WebSearch"],"deferred_total":120},"mcp":{"servers":["cowork","workspace","mcp-tools-istefox","github"],"versions":{"mcp-tools-istefox":"unknown","github":"unknown"}},"skills":{"available_count":47,"invoked":["caveman","engineering:system-design"]},"plugins":["organon","engineering","mattpocock-skills","anthropic-skills"],"plugin_versions":{"organon":"1.1.0","engineering":"unknown","mattpocock-skills":"unknown","anthropic-skills":"unknown"},"errors":[{"tool":"Read","msg":"ENOENT","when":"mid"}],"task":"design telemetry sys","tags":["design","telemetry","meta"]}
 ```
 
 ## Smoke Test

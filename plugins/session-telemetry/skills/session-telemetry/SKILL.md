@@ -6,7 +6,7 @@ description: Append a structured snapshot of the current Claude session (context
 # session-telemetry
 
 Log target: `99 - Méta/AI/Telemetry/sessions.ndjson`
-Both surfaces (Cowork + Code) use `mcp__mcp-tools-istefox__append_to_vault_file`. No filesystem path needed.
+Both surfaces (Cowork + Code) use `mcp__plugin_organon_organon__append_to_vault_file`. No filesystem path needed.
 
 ## Surface Field
 
@@ -46,7 +46,7 @@ Load `references/append-mcp.md` for the exact MCP call sequence.
 
 ## Error Handling
 
-- istefox MCP not available → fail: "Connect Organon vault first (mcp-tools-istefox)." No fallback.
+- Organon MCP not available → fail: "Connect Organon vault first (organon plugin)." No fallback.
 - MCP call returns error → surface error verbatim; no silent retry.
 
 ## Confirmation

@@ -36,8 +36,8 @@
       "source": {
         "source": "github",
         "repo": "folotp/pa-toolkit",
-        "ref": "v0.1.0",
-        "sha": "60d54257ad8bb0171df2df15f24dc6b099cfd9f1"
+        "ref": "v0.1.1",
+        "sha": "600363ee5e5585ec26f211b37bc0ee96c46b4295"
       },
       "description": "PA's personal toolkit — decision-gatekeeper agent (triages a proposed change against a domain's decision records, driven by governance profiles in the Organon vault), six fin-* PocketSmith/Rogers skills, and a generalized plugin-release runbook for all of PA's plugins.",
       "category": "productivity",

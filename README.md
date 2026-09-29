@@ -20,7 +20,7 @@ For a private repo, ensure `gh auth status` shows you're logged in to GitHub bef
 | --- | --- | --- | --- |
 | [`projectionlab`](plugins/projectionlab/) | 0.1.0 | in-repo | Read-only access to ProjectionLab financial plans via the Chrome MCP. |
 | [`session-telemetry`](plugins/session-telemetry/) | 0.2.1 | in-repo | Captures a structured snapshot of the current Claude session and appends one NDJSON line to the Organon vault telemetry log via Organon MCP. |
-| [`organon`](https://github.com/folotp/organon-plugin) | 1.3.3 | [`folotp/organon-plugin`](https://github.com/folotp/organon-plugin) | Organon vault conventions for Claude — 7 description-triggered skills covering write discipline, frontmatter, markdown style, session discipline, Bases, JSON Canvas, and diagramming. |
+| [`organon`](https://github.com/folotp/organon-plugin) | 1.3.3 | [`folotp/organon-plugin`](https://github.com/folotp/organon-plugin) | Organon vault conventions for Claude — 8 description-triggered skills covering read and write discipline, frontmatter, markdown style, session discipline, Bases, JSON Canvas, and diagramming. |
 | [`pa-toolkit`](https://github.com/folotp/pa-toolkit) | 0.1.1 | [`folotp/pa-toolkit`](https://github.com/folotp/pa-toolkit) | PA's personal toolkit — decision-gatekeeper agent (triages a proposed change against a domain's decision records, driven by governance profiles in the Organon vault), six fin-* PocketSmith/Rogers skills, and a generalized plugin-release runbook for all of PA's plugins. |
 
 ## Plugin sources

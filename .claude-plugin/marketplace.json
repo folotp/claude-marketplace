@@ -30,6 +30,18 @@
       "description": "Organon vault conventions for Claude — 7 description-triggered skills covering MCP write discipline, frontmatter schema, body markdown style, session discipline, Bases views, JSON Canvas cartography, and Mermaid/Excalidraw diagramming. Absorbs kepano obsidian-skills content verbatim (drift-tracked) — no runtime cascade required.",
       "category": "knowledge-management",
       "tags": ["obsidian", "organon", "vault", "frontmatter", "session-discipline", "knowledge-management"]
+    },
+    {
+      "name": "pa-toolkit",
+      "source": {
+        "source": "github",
+        "repo": "folotp/pa-toolkit",
+        "ref": "v0.1.0",
+        "sha": "60d54257ad8bb0171df2df15f24dc6b099cfd9f1"
+      },
+      "description": "PA's personal toolkit — decision-gatekeeper agent (triages a proposed change against a domain's decision records, driven by governance profiles in the Organon vault), six fin-* PocketSmith/Rogers skills, and a generalized plugin-release runbook for all of PA's plugins.",
+      "category": "productivity",
+      "tags": ["decision-records", "governance", "organon", "finance", "pocketsmith", "plugin-release"]
     }
   ]
 }

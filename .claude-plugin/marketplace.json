@@ -27,7 +27,7 @@
         "ref": "v1.3.3",
         "sha": "221f620e0cc2fda110c8d88e0ca2b030cda88450"
       },
-      "description": "Organon vault conventions for Claude — 7 description-triggered skills covering MCP write discipline, frontmatter schema, body markdown style, session discipline, Bases views, JSON Canvas cartography, and Mermaid/Excalidraw diagramming. Absorbs kepano obsidian-skills content verbatim (drift-tracked) — no runtime cascade required.",
+      "description": "Organon vault conventions for Claude — 8 description-triggered skills covering MCP read and write discipline, frontmatter schema, body markdown style, session discipline, Bases views, JSON Canvas cartography, and Mermaid/Excalidraw diagramming. Absorbs kepano obsidian-skills content verbatim (drift-tracked) — no runtime cascade required.",
       "category": "knowledge-management",
       "tags": ["obsidian", "organon", "vault", "frontmatter", "session-discipline", "knowledge-management"]
     },
